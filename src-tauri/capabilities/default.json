@@ -5,13 +5,25 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "shell:allow-open",
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [{ "path": "$APPLOCALDATA/**" }]
+    },
     "sql:allow-execute",
     "sql:allow-select",
     "sql:allow-load",
     "sql:allow-close",
     "fs:default",
+    "fs:allow-mkdir",
+    "fs:allow-copy-file",
+    "fs:allow-remove",
+    "fs:allow-exists",
+    "fs:allow-read-dir",
     "dialog:allow-open",
-    "dialog:allow-save"
+    "dialog:allow-save",
+    {
+      "identifier": "fs:scope",
+      "allow": [{ "path": "$APPLOCALDATA/**" }, { "path": "$APPDATA/**" }]
+    }
   ]
 }
