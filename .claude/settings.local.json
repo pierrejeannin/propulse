@@ -14,7 +14,8 @@
       "Bash(npx create-tauri-app@latest . --template react-ts --manager npm --ci)",
       "PowerShell($env:PATH += \";$env:USERPROFILE\\\\.cargo\\\\bin\"; Set-Location \"C:\\\\Users\\\\Minous\\\\Documents\\\\Propulse\"; npx create-tauri-app@latest . --template react-ts --manager npm --ci 2>&1)",
       "Bash(npm install *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(node -e \"require\\('./node_modules/@tiptap/react/dist/index.js'\\); console.log\\('TipTap OK'\\)\")"
     ]
   }
 }

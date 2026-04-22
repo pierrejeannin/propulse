@@ -78,3 +78,20 @@ export interface Dossier {
 export interface DossierWithClient extends Dossier {
   client_nom: string | null;
 }
+
+// ─── COMPTE-RENDU ─────────────────────────────────────────────────────────────
+
+export interface CompteRendu {
+  id: number;
+  dossier_id: number;
+  titre: string;
+  date_rdv: string;
+  participants: string | null;
+  contexte_existant: string | null;
+  besoins_exprimes: string | null;
+  metriques_cles: string | null;
+  pistes_solution: string | null;
+  actions_next_steps: string | null;
+  created_at: string;
+  updated_at: string;
+}

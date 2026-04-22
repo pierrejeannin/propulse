@@ -30,6 +30,7 @@ import {
   updateDossierStatut,
   deleteDossier,
 } from "@/lib/queries";
+import { CRTab } from "@/components/compte-rendus/CRTab";
 import { STATUTS, type DossierWithClient, type Statut } from "@/lib/types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -418,11 +419,7 @@ export default function DossierDetail() {
           </TabsContent>
 
           <TabsContent value="comptes-rendus">
-            <TabPlaceholder
-              icon={FileText}
-              label="Comptes-rendus RDV"
-              description="Les notes de rendez-vous structurées apparaîtront ici."
-            />
+            <CRTab dossierId={dossier.id} />
           </TabsContent>
 
           <TabsContent value="chiffrage">

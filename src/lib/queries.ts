@@ -1,5 +1,5 @@
 import { getDb } from "./db";
-import type { Client, DossierWithClient, Statut } from "./types";
+import type { Client, CompteRendu, DossierWithClient, Statut } from "./types";
 
 // ─── CLIENTS ─────────────────────────────────────────────────────────────────
 
@@ -150,4 +150,96 @@ export async function updateDossierStatut(
 export async function deleteDossier(id: number): Promise<void> {
   const db = await getDb();
   await db.execute("DELETE FROM dossiers WHERE id = ?", [id]);
+}
+
+// ─── COMPTES-RENDUS ───────────────────────────────────────────────────────────
+
+export async function getCompteRendus(dossierId: number): Promise<CompteRendu[]> {
+  const db = await getDb();
+  return db.select<CompteRendu[]>(
+    `SELECT * FROM compte_rendus WHERE dossier_id = ? ORDER BY date_rdv DESC, created_at DESC`,
+    [dossierId]
+  );
+}
+
+export async function getCompteRenduById(id: number): Promise<CompteRendu | null> {
+  const db = await getDb();
+  const rows = await db.select<CompteRendu[]>(
+    `SELECT * FROM compte_rendus WHERE id = ?`,
+    [id]
+  );
+  return rows[0] ?? null;
+}
+
+export async function createCompteRendu(data: {
+  dossier_id: number;
+  titre: string;
+  date_rdv: string;
+  participants: string | null;
+  contexte_existant: string | null;
+  besoins_exprimes: string | null;
+  metriques_cles: string | null;
+  pistes_solution: string | null;
+  actions_next_steps: string | null;
+}): Promise<number> {
+  const db = await getDb();
+  const result = await db.execute(
+    `INSERT INTO compte_rendus
+       (dossier_id, titre, date_rdv, participants,
+        contexte_existant, besoins_exprimes, metriques_cles,
+        pistes_solution, actions_next_steps)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      data.dossier_id,
+      data.titre,
+      data.date_rdv,
+      data.participants,
+      data.contexte_existant,
+      data.besoins_exprimes,
+      data.metriques_cles,
+      data.pistes_solution,
+      data.actions_next_steps,
+    ]
+  );
+  return result.lastInsertId as number;
+}
+
+export async function updateCompteRendu(
+  id: number,
+  data: {
+    titre: string;
+    date_rdv: string;
+    participants: string | null;
+    contexte_existant: string | null;
+    besoins_exprimes: string | null;
+    metriques_cles: string | null;
+    pistes_solution: string | null;
+    actions_next_steps: string | null;
+  }
+): Promise<void> {
+  const db = await getDb();
+  await db.execute(
+    `UPDATE compte_rendus
+     SET titre = ?, date_rdv = ?, participants = ?,
+         contexte_existant = ?, besoins_exprimes = ?,
+         metriques_cles = ?, pistes_solution = ?,
+         actions_next_steps = ?, updated_at = datetime('now')
+     WHERE id = ?`,
+    [
+      data.titre,
+      data.date_rdv,
+      data.participants,
+      data.contexte_existant,
+      data.besoins_exprimes,
+      data.metriques_cles,
+      data.pistes_solution,
+      data.actions_next_steps,
+      id,
+    ]
+  );
+}
+
+export async function deleteCompteRendu(id: number): Promise<void> {
+  const db = await getDb();
+  await db.execute("DELETE FROM compte_rendus WHERE id = ?", [id]);
 }

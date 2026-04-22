@@ -5,6 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/propulse.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Propulse</title>
+    <!-- Anti-flash : applique le thème persisté AVANT le premier rendu -->
+    <script>
+      try {
+        var t = localStorage.getItem('propulse-theme');
+        if (t === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+        }
+        // 'dark' ou null → class="dark" déjà présente, rien à faire
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
