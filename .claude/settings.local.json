@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(cargo --version)",
+      "Bash(rustc --version)",
+      "PowerShell(cargo --version 2>&1)",
+      "PowerShell(rustc --version 2>&1)",
+      "PowerShell(winget --version 2>&1)",
+      "PowerShell(Get-Command winget 2>&1)",
+      "PowerShell(winget install --id Rustlang.Rustup -e --accept-package-agreements --accept-source-agreements 2>&1)",
+      "Bash(export PATH=\"$PATH:/c/Users/Minous/.cargo/bin\")",
+      "Bash(npm create *)",
+      "Bash(npx create-tauri-app@latest . --template react-ts --manager npm --ci)",
+      "PowerShell($env:PATH += \";$env:USERPROFILE\\\\.cargo\\\\bin\"; Set-Location \"C:\\\\Users\\\\Minous\\\\Documents\\\\Propulse\"; npx create-tauri-app@latest . --template react-ts --manager npm --ci 2>&1)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}
