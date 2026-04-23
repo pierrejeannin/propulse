@@ -11,12 +11,18 @@ const STATUTS = [
 ] as const;
 
 const statutColors: Record<string, string> = {
-  Découverte: "bg-slate-500/20 border-slate-500/30 text-slate-300",
-  Qualification: "bg-blue-500/20 border-blue-500/30 text-blue-300",
-  Proposition: "bg-violet-500/20 border-violet-500/30 text-violet-300",
-  Soutenance: "bg-amber-500/20 border-amber-500/30 text-amber-300",
-  Gagné: "bg-emerald-500/20 border-emerald-500/30 text-emerald-300",
-  Perdu: "bg-red-500/20 border-red-500/30 text-red-300",
+  Découverte:
+    "bg-slate-100 border-slate-300 text-slate-600 dark:bg-slate-500/20 dark:border-slate-500/30 dark:text-slate-300",
+  Qualification:
+    "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-500/20 dark:border-blue-500/30 dark:text-blue-300",
+  Proposition:
+    "bg-violet-50 border-violet-200 text-violet-700 dark:bg-violet-500/20 dark:border-violet-500/30 dark:text-violet-300",
+  Soutenance:
+    "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/20 dark:border-amber-500/30 dark:text-amber-300",
+  Gagné:
+    "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/20 dark:border-emerald-500/30 dark:text-emerald-300",
+  Perdu:
+    "bg-red-50 border-red-200 text-red-700 dark:bg-red-500/20 dark:border-red-500/30 dark:text-red-300",
 };
 
 export default function Dashboard() {
@@ -49,7 +55,7 @@ export default function Dashboard() {
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
             <div className="rounded-lg bg-amber-500/10 p-2">
-              <Clock className="h-4 w-4 text-amber-400" />
+              <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
               <p className="text-2xl font-bold">—</p>
@@ -60,7 +66,7 @@ export default function Dashboard() {
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
             <div className="rounded-lg bg-emerald-500/10 p-2">
-              <Trophy className="h-4 w-4 text-emerald-400" />
+              <Trophy className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
               <p className="text-2xl font-bold">—</p>
@@ -78,7 +84,7 @@ export default function Dashboard() {
               className={`flex items-center justify-between rounded-lg border px-3 py-2 ${statutColors[statut]}`}
             >
               <span className="text-xs font-semibold">{statut}</span>
-              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs">0</span>
+              <span className="rounded-full bg-black/10 px-2 py-0.5 text-xs dark:bg-white/10">0</span>
             </div>
             <div className="flex flex-1 flex-col gap-2 rounded-xl border border-dashed border-border bg-card/30 p-2 min-h-32">
               <p className="py-4 text-center text-xs text-muted-foreground/50">

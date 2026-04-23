@@ -31,6 +31,7 @@ import {
   deleteDossier,
 } from "@/lib/queries";
 import { CRTab } from "@/components/compte-rendus/CRTab";
+import { DevisTab } from "@/components/chiffrage/DevisTab";
 import { STATUTS, type DossierWithClient, type Statut } from "@/lib/types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -423,11 +424,7 @@ export default function DossierDetail() {
           </TabsContent>
 
           <TabsContent value="chiffrage">
-            <TabPlaceholder
-              icon={Calculator}
-              label="Chiffrage"
-              description="Le devis et les lignes articles de ce dossier seront ici."
-            />
+            <DevisTab dossierId={dossier.id} />
           </TabsContent>
 
           <TabsContent value="schemas">

@@ -97,7 +97,7 @@ function DossierCard({ dossier }: { dossier: DossierWithClient }) {
           className={cn(
             "flex items-center gap-1",
             isLate && "font-medium text-destructive",
-            deadline === "Aujourd'hui" && "font-medium text-amber-400"
+            deadline === "Aujourd'hui" && "font-medium text-amber-600 dark:text-amber-400"
           )}
         >
           <Calendar className="h-3 w-3 shrink-0" />
@@ -109,7 +109,7 @@ function DossierCard({ dossier }: { dossier: DossierWithClient }) {
                   className={cn(
                     "ml-1 rounded px-1 py-0.5 text-[10px] font-semibold",
                     isLate && "bg-destructive/15 text-destructive",
-                    !isLate && "bg-amber-500/15 text-amber-400"
+                    !isLate && "bg-amber-500/15 text-amber-600 dark:text-amber-400"
                   )}
                 >
                   {deadline}

@@ -15,7 +15,11 @@
       "PowerShell($env:PATH += \";$env:USERPROFILE\\\\.cargo\\\\bin\"; Set-Location \"C:\\\\Users\\\\Minous\\\\Documents\\\\Propulse\"; npx create-tauri-app@latest . --template react-ts --manager npm --ci 2>&1)",
       "Bash(npm install *)",
       "Bash(npx tsc *)",
-      "Bash(node -e \"require\\('./node_modules/@tiptap/react/dist/index.js'\\); console.log\\('TipTap OK'\\)\")"
+      "Bash(node -e \"require\\('./node_modules/@tiptap/react/dist/index.js'\\); console.log\\('TipTap OK'\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('plugins',{}\\), indent=2\\)\\)\")",
+      "Bash(dir \"C:\\\\Users\\\\Minous\\\\Documents\\\\Propulse\\\\src-tauri\" /B /S)",
+      "Bash(findstr /V \".rs\")",
+      "Bash(findstr /V \"target\")"
     ]
   }
 }
