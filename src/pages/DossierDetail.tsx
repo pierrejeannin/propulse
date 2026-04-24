@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   Pencil,
@@ -32,6 +32,7 @@ import {
 } from "@/lib/queries";
 import { CRTab } from "@/components/compte-rendus/CRTab";
 import { DevisTab } from "@/components/chiffrage/DevisTab";
+import { SchemaTab } from "@/components/schemas/SchemaTab";
 import { STATUTS, type DossierWithClient, type Statut } from "@/lib/types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -199,6 +200,9 @@ function InfoRow({
 export default function DossierDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialTab =
+    (location.state as { tab?: string } | null)?.tab ?? "informations";
 
   const [dossier, setDossier] = useState<DossierWithClient | null>(null);
   const [loading, setLoading] = useState(true);
@@ -388,7 +392,7 @@ export default function DossierDetail() {
       </div>
 
       {/* ── Onglets ─────────────────────────────────────────────────────── */}
-      <Tabs defaultValue="informations" className="flex flex-1 flex-col overflow-hidden">
+      <Tabs defaultValue={initialTab} className="flex flex-1 flex-col overflow-hidden">
         <div className="border-b border-border px-6 py-2">
           <TabsList className="h-8">
             <TabsTrigger value="informations" className="gap-1.5 text-xs">
@@ -428,11 +432,7 @@ export default function DossierDetail() {
           </TabsContent>
 
           <TabsContent value="schemas">
-            <TabPlaceholder
-              icon={Network}
-              label="Schémas d'architecture"
-              description="Les schémas PNG/SVG rattachés à ce dossier seront ici."
-            />
+            <SchemaTab dossierId={dossier.id} />
           </TabsContent>
 
           <TabsContent value="powerpoint">

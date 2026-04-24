@@ -12,6 +12,9 @@ import type {
   DevisSection,
   DossierWithClient,
   PrestationLigne,
+  SchemaArchitecture,
+  SchemaAvecDossier,
+  type SchemaType,
   Statut,
 } from "./types";
 
@@ -753,4 +756,56 @@ export async function updatePrestationLigne(
 export async function deletePrestationLigne(id: number): Promise<void> {
   const db = await getDb();
   await db.execute("DELETE FROM prestation_lignes WHERE id = ?", [id]);
+}
+
+// ─── SCHÉMAS D'ARCHITECTURE ──────────────────────────────────────────────────
+
+export async function getSchemas(
+  dossierId: number
+): Promise<SchemaArchitecture[]> {
+  const db = await getDb();
+  return db.select<SchemaArchitecture[]>(
+    "SELECT * FROM schemas_architecture WHERE dossier_id = ? ORDER BY created_at DESC",
+    [dossierId]
+  );
+}
+
+export async function getAllSchemas(): Promise<SchemaAvecDossier[]> {
+  const db = await getDb();
+  return db.select<SchemaAvecDossier[]>(
+    `SELECT sa.*, d.titre AS dossier_titre, c.nom AS client_nom
+     FROM schemas_architecture sa
+     JOIN dossiers d ON sa.dossier_id = d.id
+     LEFT JOIN clients c ON d.client_id = c.id
+     ORDER BY sa.created_at DESC`
+  );
+}
+
+export async function createSchema(data: {
+  dossier_id: number;
+  nom: string;
+  chemin_fichier: string;
+  type: SchemaType;
+  date_schema: string | null;
+}): Promise<number> {
+  const db = await getDb();
+  const result = await db.execute(
+    `INSERT INTO schemas_architecture (dossier_id, nom, chemin_fichier, type, date_schema)
+     VALUES (?, ?, ?, ?, ?)`,
+    [data.dossier_id, data.nom, data.chemin_fichier, data.type, data.date_schema]
+  );
+  return result.lastInsertId as number;
+}
+
+export async function renameSchema(id: number, nom: string): Promise<void> {
+  const db = await getDb();
+  await db.execute("UPDATE schemas_architecture SET nom = ? WHERE id = ?", [
+    nom,
+    id,
+  ]);
+}
+
+export async function deleteSchema(id: number): Promise<void> {
+  const db = await getDb();
+  await db.execute("DELETE FROM schemas_architecture WHERE id = ?", [id]);
 }

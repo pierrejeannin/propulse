@@ -200,6 +200,25 @@ export interface PrestationLigne {
   created_at: string;
 }
 
+// ─── SCHÉMAS D'ARCHITECTURE ──────────────────────────────────────────────────
+
+export type SchemaType = "PNG" | "SVG" | "JPEG";
+
+export interface SchemaArchitecture {
+  id: number;
+  dossier_id: number;
+  nom: string;
+  chemin_fichier: string;
+  type: SchemaType;
+  date_schema: string | null;
+  created_at: string;
+}
+
+export interface SchemaAvecDossier extends SchemaArchitecture {
+  dossier_titre: string;
+  client_nom: string | null;
+}
+
 // ─── Helpers calcul ───────────────────────────────────────────────────────────
 
 export function totalLigne(l: DevisLigne): number {

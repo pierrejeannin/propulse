@@ -19,8 +19,11 @@
     "fs:allow-remove",
     "fs:allow-exists",
     "fs:allow-read-dir",
+    "fs:allow-read-file",
+    "fs:allow-write-file",
     "dialog:allow-open",
     "dialog:allow-save",
+    "dialog:allow-confirm",
     {
       "identifier": "fs:scope",
       "allow": [{ "path": "$APPLOCALDATA/**" }, { "path": "$APPDATA/**" }]
