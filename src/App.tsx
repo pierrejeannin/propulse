@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import Pipeline from "@/pages/Pipeline";
 import Dashboard from "@/pages/Dashboard";
 import Dossiers from "@/pages/Dossiers";
 import DossierDetail from "@/pages/DossierDetail";
@@ -15,7 +16,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/pipeline" replace />} />
-        <Route path="pipeline" element={<Dashboard />} />
+        <Route path="pipeline" element={<Pipeline />} />
         <Route path="dossiers" element={<Dossiers />} />
         <Route path="dossiers/:id" element={<DossierDetail />} />
         <Route path="comptes-rendus" element={<CompteRendus />} />
