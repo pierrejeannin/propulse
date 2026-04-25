@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
-import { Loader2, Package, Users } from "lucide-react";
+import { Loader2, Package, Users, FileSpreadsheet } from "lucide-react";
 import { getOrCreateDevis } from "@/lib/queries";
 import { FournituresTab } from "./FournituresTab";
 import { PrestationTab } from "./PrestationTab";
 import { cn } from "@/lib/utils";
 import { margeLigne } from "@/lib/types";
-import type { DevisLigne } from "@/lib/types";
+import type { DevisLigne, DossierWithClient } from "@/lib/types";
+import { exportDevisExcel } from "@/lib/exportExcel";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -23,12 +24,14 @@ type SubTab = "fournitures" | "prestation";
 
 interface DevisTabProps {
   dossierId: number;
+  dossier: DossierWithClient;
 }
 
-export function DevisTab({ dossierId }: DevisTabProps) {
+export function DevisTab({ dossierId, dossier }: DevisTabProps) {
   const [devisId, setDevisId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<SubTab>("fournitures");
+  const [exporting, setExporting] = useState(false);
 
   // Totaux remontés depuis les sous-onglets
   const [fournituresHT, setFournituresHT] = useState(0);
@@ -51,6 +54,18 @@ export function DevisTab({ dossierId }: DevisTabProps) {
     },
     []
   );
+
+  const handleExport = async () => {
+    if (!devisId) return;
+    setExporting(true);
+    try {
+      await exportDevisExcel(dossier, devisId, fournituresHT, prestationHT);
+    } catch (e) {
+      console.error("Erreur export Excel", e);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -78,7 +93,8 @@ export function DevisTab({ dossierId }: DevisTabProps) {
 
   return (
     <div className="flex flex-col gap-4 p-6">
-      {/* ── Sous-onglets ──────────────────────────────────────────────────── */}
+      {/* ── Toolbar : sous-onglets + bouton export ────────────────────────── */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
       <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-1 w-fit">
         <button
           type="button"
@@ -105,6 +121,22 @@ export function DevisTab({ dossierId }: DevisTabProps) {
         >
           <Users className="h-3.5 w-3.5" />
           Prestation
+        </button>
+      </div>
+
+        {/* Bouton Export Excel */}
+        <button
+          type="button"
+          onClick={handleExport}
+          disabled={exporting}
+          className="flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:border-emerald-500/40 hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-50 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-400"
+        >
+          {exporting ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <FileSpreadsheet className="h-3.5 w-3.5" />
+          )}
+          Exporter en Excel
         </button>
       </div>
 

@@ -428,7 +428,7 @@ export default function DossierDetail() {
           </TabsContent>
 
           <TabsContent value="chiffrage">
-            <DevisTab dossierId={dossier.id} />
+            <DevisTab dossierId={dossier.id} dossier={dossier} />
           </TabsContent>
 
           <TabsContent value="schemas">
