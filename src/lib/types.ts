@@ -103,6 +103,12 @@ export interface CompteRendu {
   updated_at: string;
 }
 
+// Vue transversale (page Comptes-rendus sidebar)
+export interface CompteRenduAvecDossier extends CompteRendu {
+  dossier_titre: string;
+  client_nom: string | null;
+}
+
 // ─── CATALOGUE ────────────────────────────────────────────────────────────────
 
 export const ARTICLE_TYPES = ["Licence", "Matériel", "Service"] as const;
@@ -217,6 +223,36 @@ export interface SchemaArchitecture {
 export interface SchemaAvecDossier extends SchemaArchitecture {
   dossier_titre: string;
   client_nom: string | null;
+}
+
+// ─── BIBLIOTHÈQUE SLIDES ──────────────────────────────────────────────────────
+
+export interface BibliothequeSlide {
+  id: number;
+  nom: string;
+  tags: string; // JSON array string e.g. '["Veeam","Backup"]'
+  fichier_path: string;
+  thumbnail_path: string | null;
+  created_at: string;
+}
+
+// ─── PRÉSENTATION BLOCS ───────────────────────────────────────────────────────
+
+export type BlocType =
+  | "page_garde"
+  | "compte_rendu"
+  | "chiffrage"
+  | "schema"
+  | "bibliotheque";
+
+export interface PresentationBloc {
+  id: number;
+  dossier_id: number;
+  type: BlocType;
+  ordre: number;
+  reference_id: number | null;
+  label: string | null;
+  created_at: string;
 }
 
 // ─── Helpers calcul ───────────────────────────────────────────────────────────

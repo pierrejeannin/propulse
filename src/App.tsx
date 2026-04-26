@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import Pipeline from "@/pages/Pipeline";
-import Dashboard from "@/pages/Dashboard";
 import Dossiers from "@/pages/Dossiers";
 import DossierDetail from "@/pages/DossierDetail";
 import CompteRendus from "@/pages/CompteRendus";

@@ -4,7 +4,6 @@ import { Calculator, Search, Building2, ArrowRight } from "lucide-react";
 import { getAllDevisAvecTotal } from "@/lib/queries";
 import type { DevisAvecTotal } from "@/lib/types";
 import { StatutBadge } from "@/components/dossiers/StatutBadge";
-import { cn } from "@/lib/utils";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -54,12 +53,6 @@ export default function Chiffrage() {
 
   // Stats globales
   const totalGlobal = devis.reduce((s, d) => s + d.total_ht, 0);
-  const devisAvecMarge = devis.filter((d) => d.marge_globale !== null);
-  const margeMoyenne =
-    devisAvecMarge.length > 0
-      ? devisAvecMarge.reduce((s, d) => s + (d.marge_globale ?? 0), 0) /
-        devisAvecMarge.length
-      : null;
 
   return (
     <div className="flex h-full flex-col">
@@ -75,7 +68,7 @@ export default function Chiffrage() {
       </div>
 
       {/* ── Stats globales ───────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-3 border-b border-border px-6 py-4">
+      <div className="grid grid-cols-2 gap-3 border-b border-border px-6 py-4">
         <div className="rounded-lg border border-border bg-card p-3">
           <p className="text-xs text-muted-foreground">Devis actifs</p>
           <p className="mt-0.5 text-2xl font-bold">{devis.length}</p>
@@ -89,23 +82,6 @@ export default function Chiffrage() {
               minimumFractionDigits: 0,
               maximumFractionDigits: 0,
             }).format(totalGlobal)}
-          </p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-3">
-          <p className="text-xs text-muted-foreground">Marge moyenne</p>
-          <p
-            className={cn(
-              "mt-0.5 text-2xl font-bold",
-              margeMoyenne === null
-                ? "text-muted-foreground"
-                : margeMoyenne >= 30
-                ? "text-emerald-600 dark:text-emerald-400"
-                : margeMoyenne >= 15
-                ? "text-amber-600 dark:text-amber-400"
-                : "text-destructive"
-            )}
-          >
-            {margeMoyenne !== null ? `${margeMoyenne.toFixed(1)} %` : "—"}
           </p>
         </div>
       </div>
@@ -135,12 +111,12 @@ export default function Chiffrage() {
             <div>
               <p className="text-sm font-medium">
                 {devis.length === 0
-                  ? "Aucun devis"
+                  ? "Aucun chiffrage"
                   : "Aucun résultat"}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {devis.length === 0
-                  ? "Les devis apparaissent ici dès que vous ouvrez l'onglet Chiffrage d'un dossier."
+                  ? "Un devis est créé automatiquement à la première ouverture de l'onglet Chiffrage d'un dossier."
                   : "Modifiez votre recherche."}
               </p>
             </div>
@@ -160,9 +136,6 @@ export default function Chiffrage() {
                 </th>
                 <th className="px-5 py-2.5 text-right text-xs font-semibold text-muted-foreground">
                   Total HT
-                </th>
-                <th className="px-5 py-2.5 text-right text-xs font-semibold text-muted-foreground">
-                  Marge
                 </th>
                 <th className="px-5 py-2.5 text-right text-xs font-semibold text-muted-foreground">
                   Mis à jour
@@ -201,24 +174,6 @@ export default function Chiffrage() {
                   </td>
                   <td className="px-5 py-3 text-right font-semibold">
                     {formatEur(d.total_ht)}
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    {d.marge_globale !== null ? (
-                      <span
-                        className={cn(
-                          "font-medium",
-                          d.marge_globale >= 30
-                            ? "text-emerald-600 dark:text-emerald-400"
-                            : d.marge_globale >= 15
-                            ? "text-amber-600 dark:text-amber-400"
-                            : "text-destructive"
-                        )}
-                      >
-                        {d.marge_globale.toFixed(1)} %
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground/40">—</span>
-                    )}
                   </td>
                   <td className="px-5 py-3 text-right text-muted-foreground">
                     {formatDatetime(d.updated_at)}

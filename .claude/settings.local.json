@@ -20,7 +20,13 @@
       "Bash(dir \"C:\\\\Users\\\\Minous\\\\Documents\\\\Propulse\\\\src-tauri\" /B /S)",
       "Bash(findstr /V \".rs\")",
       "Bash(findstr /V \"target\")",
-      "Bash(npm list *)"
+      "Bash(npm list *)",
+      "Bash(powershell -Command \"Expand-Archive -Path 'C:\\\\\\\\Users\\\\\\\\Minous\\\\\\\\Downloads\\\\\\\\Template powerpoint.pptx' -DestinationPath 'C:\\\\\\\\Users\\\\\\\\Minous\\\\\\\\Downloads\\\\\\\\pptx_unzip' -Force; Get-ChildItem 'C:\\\\\\\\Users\\\\\\\\Minous\\\\\\\\Downloads\\\\\\\\pptx_unzip' -Recurse | Select-Object FullName | Format-List\")",
+      "Bash(dir \"C:\\\\Users\\\\Minous\\\\Documents\\\\Propulse\\\\src-tauri\\\\migrations\")",
+      "Bash(python3 -c \"import sys; import xml.dom.minidom; print\\(xml.dom.minidom.parseString\\(sys.stdin.read\\(\\)\\).toprettyxml\\(indent=' '\\)\\)\")",
+      "Bash(node -e ' *)",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\Minous\\\\Downloads\\\\Template powerpoint.pptx\" \"C:\\\\Users\\\\Minous\\\\Documents\\\\Propulse\\\\public\\\\Template_powerpoint.pptx\" -Force)",
+      "PowerShell(if \\($?\\) { \"OK\" } else { \"FAIL\" })"
     ]
   }
 }

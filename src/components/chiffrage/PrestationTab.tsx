@@ -178,7 +178,7 @@ function PrestationRowCells({ row, onChange, onSave, onDelete }: PrestationRowPr
   return (
     <tr className="group border-b border-border/50 hover:bg-accent/10 transition-colors align-top">
       {/* Tâche */}
-      <td className="px-2 py-1.5">
+      <td className="px-2 py-1.5 w-[180px]">
         <input
           className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/30 focus:bg-accent/30 rounded px-1 py-0.5"
           placeholder="Tâche…"
@@ -189,7 +189,7 @@ function PrestationRowCells({ row, onChange, onSave, onDelete }: PrestationRowPr
       </td>
 
       {/* Description */}
-      <td className="px-2 py-1.5 max-w-[160px] align-top">
+      <td className="px-2 py-1.5 align-top">
         <textarea
           rows={1}
           className="w-full bg-transparent text-sm text-muted-foreground outline-none placeholder:text-muted-foreground/30 focus:bg-accent/30 rounded px-1 py-0.5 leading-snug"
@@ -212,7 +212,7 @@ function PrestationRowCells({ row, onChange, onSave, onDelete }: PrestationRowPr
       </td>
 
       {/* Profil */}
-      <td className="px-2 py-1.5">
+      <td className="px-2 py-1.5 w-[200px]">
         <InlineProfilCell
           value={row.profil_label}
           articleId={row.article_id}
@@ -231,7 +231,7 @@ function PrestationRowCells({ row, onChange, onSave, onDelete }: PrestationRowPr
       </td>
 
       {/* Jours */}
-      <td className="px-2 py-1.5 w-20">
+      <td className="px-2 py-1.5 w-[80px]">
         <input
           type="number"
           min="0.5"
@@ -245,7 +245,7 @@ function PrestationRowCells({ row, onChange, onSave, onDelete }: PrestationRowPr
       </td>
 
       {/* TJM */}
-      <td className="px-2 py-1.5 w-28">
+      <td className="px-2 py-1.5 w-[120px]">
         <div className="flex items-center gap-0.5">
           <input
             type="number"
@@ -262,14 +262,14 @@ function PrestationRowCells({ row, onChange, onSave, onDelete }: PrestationRowPr
       </td>
 
       {/* Total HT */}
-      <td className="px-3 py-1.5 text-right w-28">
+      <td className="px-3 py-1.5 text-right w-[120px]">
         <span className={cn("text-sm font-semibold", total > 0 ? "" : "text-muted-foreground/30")}>
           {total > 0 ? fmt(total) : "—"}
         </span>
       </td>
 
       {/* Actions */}
-      <td className="px-2 py-1.5 w-8">
+      <td className="px-2 py-1.5 w-[40px]">
         <button
           type="button"
           onClick={onDelete}
@@ -304,7 +304,7 @@ function CpRow({
   return (
     <tr className="border-t-2 border-violet-200 dark:border-violet-800/50 bg-violet-50/60 dark:bg-violet-950/20 align-middle">
       {/* Tâche + % inline */}
-      <td className="px-3 py-2">
+      <td className="px-3 py-2 w-[180px]">
         <div className="flex items-center gap-1.5 flex-wrap">
           <Lock className="h-3 w-3 shrink-0 text-violet-400 dark:text-violet-500" />
           <span className="text-sm font-medium text-violet-700 dark:text-violet-300">
@@ -332,29 +332,29 @@ function CpRow({
       <td className="px-3 py-2 text-sm text-muted-foreground">—</td>
 
       {/* Profil */}
-      <td className="px-3 py-2 text-sm text-muted-foreground">
+      <td className="px-3 py-2 w-[200px] text-sm text-muted-foreground">
         {cpArticle.nom}
       </td>
 
       {/* Jours (calculés, lecture seule) */}
-      <td className="px-3 py-2 w-20 text-right">
+      <td className="px-3 py-2 w-[80px] text-right">
         <span className="text-sm font-medium">{fmtJours(cpJours)}</span>
       </td>
 
       {/* TJM */}
-      <td className="px-3 py-2 w-28 text-right text-sm text-muted-foreground">
+      <td className="px-3 py-2 w-[120px] text-right text-sm text-muted-foreground">
         {cpArticle.prix_vente > 0 ? `${fmt(cpArticle.prix_vente)} /j` : "—"}
       </td>
 
       {/* Total */}
-      <td className="px-3 py-2 w-28 text-right">
+      <td className="px-3 py-2 w-[120px] text-right">
         <span className="text-sm font-semibold text-violet-700 dark:text-violet-300">
           {fmt(cpTotal)}
         </span>
       </td>
 
       {/* Pas d'action */}
-      <td className="px-2 py-2 w-8" />
+      <td className="px-2 py-2 w-[40px]" />
     </tr>
   );
 }
@@ -546,13 +546,13 @@ export function PrestationTab({ devisId, onTotalChange }: PrestationTabProps) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-muted/30">
-                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Tâche</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground w-[180px]">Tâche</th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Description</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Profil</th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground w-20">Jours</th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground w-28">TJM</th>
-                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground w-28">Total HT</th>
-                <th className="w-8 px-2 py-2" />
+                <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground w-[200px]">Profil</th>
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground w-[80px]">Jours</th>
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground w-[120px]">TJM</th>
+                <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground w-[120px]">Total HT</th>
+                <th className="w-[40px] px-2 py-2" />
               </tr>
             </thead>
             <tbody>

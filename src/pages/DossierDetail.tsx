@@ -33,6 +33,7 @@ import {
 import { CRTab } from "@/components/compte-rendus/CRTab";
 import { DevisTab } from "@/components/chiffrage/DevisTab";
 import { SchemaTab } from "@/components/schemas/SchemaTab";
+import { PowerPointTab } from "@/components/powerpoint/PowerPointTab";
 import { STATUTS, type DossierWithClient, type Statut } from "@/lib/types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -61,33 +62,6 @@ function formatMontant(v: number | null): string {
     currency: "EUR",
     maximumFractionDigits: 0,
   }).format(v);
-}
-
-// ─── Placeholder onglet ───────────────────────────────────────────────────────
-
-function TabPlaceholder({
-  icon: Icon,
-  label,
-  description,
-}: {
-  icon: React.ElementType;
-  label: string;
-  description: string;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
-      <div className="rounded-full bg-primary/10 p-4">
-        <Icon className="h-8 w-8 text-primary/50" />
-      </div>
-      <div>
-        <p className="font-medium">{label}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </div>
-      <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground/60">
-        Module à venir
-      </span>
-    </div>
-  );
 }
 
 // ─── Onglet Informations ──────────────────────────────────────────────────────
@@ -418,29 +392,26 @@ export default function DossierDetail() {
           </TabsList>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
-          <TabsContent value="informations">
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Onglets avec scroll individuel */}
+          <TabsContent value="informations" className="flex-1 overflow-y-auto mt-0">
             <TabInformations dossier={dossier} />
           </TabsContent>
 
-          <TabsContent value="comptes-rendus">
+          <TabsContent value="comptes-rendus" className="flex-1 overflow-y-auto mt-0">
             <CRTab dossierId={dossier.id} />
           </TabsContent>
 
-          <TabsContent value="chiffrage">
+          <TabsContent value="chiffrage" className="flex-1 overflow-y-auto mt-0">
             <DevisTab dossierId={dossier.id} dossier={dossier} />
           </TabsContent>
 
-          <TabsContent value="schemas">
+          <TabsContent value="schemas" className="flex-1 overflow-y-auto mt-0">
             <SchemaTab dossierId={dossier.id} />
           </TabsContent>
 
-          <TabsContent value="powerpoint">
-            <TabPlaceholder
-              icon={Presentation}
-              label="Présentation PowerPoint"
-              description="La composition et l'export de la présentation seront ici."
-            />
+          <TabsContent value="powerpoint" className="flex-1 overflow-hidden mt-0">
+            <PowerPointTab dossierId={dossier.id} dossier={dossier} />
           </TabsContent>
         </div>
       </Tabs>

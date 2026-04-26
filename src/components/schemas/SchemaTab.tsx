@@ -17,7 +17,6 @@ import { readFile, writeFile, mkdir, exists, remove } from "@tauri-apps/plugin-f
 import { appLocalDataDir, join } from "@tauri-apps/api/path";
 import { getSchemas, createSchema, deleteSchema } from "@/lib/queries";
 import type { SchemaArchitecture, SchemaType } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

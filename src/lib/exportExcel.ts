@@ -1,6 +1,7 @@
 import XLSX from "xlsx-js-style";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeFile } from "@tauri-apps/plugin-fs";
+import { openPath } from "@tauri-apps/plugin-opener";
 import {
   getDevisSections,
   getDevisLignes,
@@ -532,4 +533,7 @@ export async function exportDevisExcel(
   // Écriture en buffer puis sauvegarde via Tauri
   const buf = XLSX.write(wb, { type: "array", bookType: "xlsx" }) as ArrayBuffer;
   await writeFile(savePath, new Uint8Array(buf));
+
+  // Ouverture automatique avec l'application par défaut
+  await openPath(savePath);
 }

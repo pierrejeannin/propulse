@@ -1,20 +1,24 @@
 import { getDb } from "./db";
 import type {
   ArticleType,
+  BibliothequeSlide,
+  BlocType,
   CatalogueArticle,
   CatalogueFamille,
   Client,
   CompteRendu,
+  CompteRenduAvecDossier,
   Devis,
   DevisAvecTotal,
   DevisLigne,
   DevisPieceJointe,
   DevisSection,
   DossierWithClient,
+  PresentationBloc,
   PrestationLigne,
   SchemaArchitecture,
   SchemaAvecDossier,
-  type SchemaType,
+  SchemaType,
   Statut,
 } from "./types";
 
@@ -186,6 +190,20 @@ export async function getCompteRenduById(id: number): Promise<CompteRendu | null
     [id]
   );
   return rows[0] ?? null;
+}
+
+export async function getAllCompteRendus(): Promise<CompteRenduAvecDossier[]> {
+  const db = await getDb();
+  return db.select<CompteRenduAvecDossier[]>(`
+    SELECT
+      cr.*,
+      dos.titre AS dossier_titre,
+      c.nom     AS client_nom
+    FROM compte_rendus cr
+    JOIN dossiers dos ON cr.dossier_id = dos.id
+    LEFT JOIN clients c ON dos.client_id = c.id
+    ORDER BY cr.date_rdv DESC, cr.created_at DESC
+  `);
 }
 
 export async function createCompteRendu(data: {
@@ -808,4 +826,113 @@ export async function renameSchema(id: number, nom: string): Promise<void> {
 export async function deleteSchema(id: number): Promise<void> {
   const db = await getDb();
   await db.execute("DELETE FROM schemas_architecture WHERE id = ?", [id]);
+}
+
+// ─── BIBLIOTHÈQUE SLIDES ──────────────────────────────────────────────────────
+
+export async function getBibliothequeSlides(): Promise<BibliothequeSlide[]> {
+  const db = await getDb();
+  return db.select<BibliothequeSlide[]>(
+    "SELECT * FROM bibliotheque_slides ORDER BY created_at DESC"
+  );
+}
+
+export async function getBibliothequeSlide(
+  id: number
+): Promise<BibliothequeSlide | null> {
+  const db = await getDb();
+  const rows = await db.select<BibliothequeSlide[]>(
+    "SELECT * FROM bibliotheque_slides WHERE id = ?",
+    [id]
+  );
+  return rows[0] ?? null;
+}
+
+export async function createBibliothequeSlide(data: {
+  nom: string;
+  tags: string[];
+  fichier_path: string;
+  thumbnail_path?: string | null;
+}): Promise<number> {
+  const db = await getDb();
+  const result = await db.execute(
+    `INSERT INTO bibliotheque_slides (nom, tags, fichier_path, thumbnail_path)
+     VALUES (?, ?, ?, ?)`,
+    [
+      data.nom.trim(),
+      JSON.stringify(data.tags),
+      data.fichier_path,
+      data.thumbnail_path ?? null,
+    ]
+  );
+  return result.lastInsertId as number;
+}
+
+export async function updateBibliothequeSlide(
+  id: number,
+  data: { nom: string; tags: string[] }
+): Promise<void> {
+  const db = await getDb();
+  await db.execute(
+    "UPDATE bibliotheque_slides SET nom = ?, tags = ? WHERE id = ?",
+    [data.nom.trim(), JSON.stringify(data.tags), id]
+  );
+}
+
+export async function deleteBibliothequeSlide(id: number): Promise<void> {
+  const db = await getDb();
+  await db.execute("DELETE FROM bibliotheque_slides WHERE id = ?", [id]);
+}
+
+// ─── PRÉSENTATION BLOCS ───────────────────────────────────────────────────────
+
+export async function getPresentationBlocs(
+  dossierId: number
+): Promise<PresentationBloc[]> {
+  const db = await getDb();
+  return db.select<PresentationBloc[]>(
+    "SELECT * FROM presentation_blocs WHERE dossier_id = ? ORDER BY ordre ASC",
+    [dossierId]
+  );
+}
+
+export async function addPresentationBloc(data: {
+  dossier_id: number;
+  type: BlocType;
+  ordre: number;
+  reference_id: number | null;
+  label: string | null;
+}): Promise<number> {
+  const db = await getDb();
+  const result = await db.execute(
+    `INSERT INTO presentation_blocs (dossier_id, type, ordre, reference_id, label)
+     VALUES (?, ?, ?, ?, ?)`,
+    [data.dossier_id, data.type, data.ordre, data.reference_id, data.label]
+  );
+  return result.lastInsertId as number;
+}
+
+export async function deletePresentationBloc(id: number): Promise<void> {
+  const db = await getDb();
+  await db.execute("DELETE FROM presentation_blocs WHERE id = ?", [id]);
+}
+
+export async function reorderPresentationBlocs(
+  updates: { id: number; ordre: number }[]
+): Promise<void> {
+  const db = await getDb();
+  for (const u of updates) {
+    await db.execute(
+      "UPDATE presentation_blocs SET ordre = ? WHERE id = ?",
+      [u.ordre, u.id]
+    );
+  }
+}
+
+export async function clearPresentationBlocs(dossierId: number): Promise<void> {
+  const db = await getDb();
+  await db.execute(
+    "DELETE FROM presentation_blocs WHERE dossier_id = ?",
+    [dossierId]
+  );
 }
