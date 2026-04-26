@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { deleteCompteRendu } from "@/lib/queries";
 import type { CompteRendu } from "@/lib/types";
+import { CRAttachments } from "./CRAttachments";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -151,6 +152,11 @@ export function CRDetail({ cr, onBack, onEdit, onDeleted }: CRDetailProps) {
             Aucun contenu renseigné dans ce compte-rendu.
           </p>
         )}
+
+        <div className="h-px bg-border" />
+
+        {/* Pièces jointes */}
+        <CRAttachments crId={cr.id} />
       </div>
     </div>
   );

@@ -339,19 +339,17 @@ export default function Pipeline() {
       ? STATUTS
       : STATUTS.filter((s) => !STATUTS_CLOTURES.has(s));
 
-    return visibleStatuts.reduce<Record<Statut, DossierWithClient[]>>(
-      (acc, statut) => {
-        acc[statut] = dossiers.filter(
-          (d) =>
-            d.statut === statut &&
-            (!q ||
-              d.titre.toLowerCase().includes(q) ||
-              (d.client_nom ?? "").toLowerCase().includes(q))
-        );
-        return acc;
-      },
-      {} as Record<Statut, DossierWithClient[]>
-    );
+    const result: Record<string, DossierWithClient[]> = {};
+    for (const statut of visibleStatuts) {
+      result[statut] = dossiers.filter(
+        (d) =>
+          d.statut === statut &&
+          (!q ||
+            d.titre.toLowerCase().includes(q) ||
+            (d.client_nom ?? "").toLowerCase().includes(q))
+      );
+    }
+    return result;
   }, [dossiers, showClotures, q]);
 
   const visibleStatuts = useMemo(

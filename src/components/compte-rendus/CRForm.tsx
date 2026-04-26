@@ -7,6 +7,7 @@ import { RichTextEditor } from "./RichTextEditor";
 import { createCompteRendu, updateCompteRendu } from "@/lib/queries";
 import type { CompteRendu } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { CRAttachments } from "./CRAttachments";
 
 // ─── Section collapsible ──────────────────────────────────────────────────────
 
@@ -263,6 +264,14 @@ export function CRForm({ dossierId, initialData, onBack, onSuccess }: CRFormProp
           <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {errors.global}
           </p>
+        )}
+
+        {/* Pièces jointes — uniquement en mode édition */}
+        {isEdit && initialData && (
+          <>
+            <div className="h-px bg-border" />
+            <CRAttachments crId={initialData.id} />
+          </>
         )}
       </div>
     </div>

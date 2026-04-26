@@ -287,7 +287,8 @@ export async function generatePresentation(
 
   let slideIdx = 1;
   let mediaIdx = 1;
-  let hasSvgMedia = false;
+  // Suivi des extensions médias ajoutées (pour Content_Types)
+  const hasMedia = { png: false, jpg: false };
 
   for (const bloc of sorted) {
     let result: SlideResult | null = null;
@@ -311,10 +312,22 @@ export async function generatePresentation(
             `Participants : ${cr.participants ?? "—"}`,
           ];
 
+          const contexte = stripHtml(cr.contexte_existant);
+          if (contexte) {
+            lines.push("", "Contexte :");
+            contexte.split("\n").filter(Boolean).forEach((l) => lines.push("  " + l));
+          }
+
           const besoins = stripHtml(cr.besoins_exprimes);
           if (besoins) {
             lines.push("", "Besoins exprimés :");
             besoins.split("\n").filter(Boolean).forEach((l) => lines.push("  " + l));
+          }
+
+          const metriques = stripHtml(cr.metriques_cles);
+          if (metriques) {
+            lines.push("", "Métriques clés :");
+            metriques.split("\n").filter(Boolean).forEach((l) => lines.push("  " + l));
           }
 
           const pistes = stripHtml(cr.pistes_solution);
@@ -384,14 +397,29 @@ export async function generatePresentation(
           const schema = schemas.find((s) => s.id === bloc.reference_id);
           if (!schema) continue;
 
-          const imgBytes = await readFile(schema.chemin_fichier);
-          const isSvg = schema.type === "SVG";
-          const ext = isSvg ? "svg" : schema.type === "JPEG" ? "jpg" : "png";
-          if (isSvg) hasSvgMedia = true;
-          const mediaFile = `slide${slideIdx}_img${mediaIdx}.${ext}`;
-          mediaIdx++;
-
-          result = makeImageSlide(schema.nom, schema.type, imgBytes, mediaFile);
+          if (schema.type === "SVG") {
+            // SVG non supporté dans PPTX → slide d'avertissement
+            result = makeContentSlide(
+              schema.nom,
+              "Schéma (format SVG)",
+              [
+                `Schéma SVG : ${schema.nom}`,
+                "",
+                "Ce format ne peut pas être intégré automatiquement dans la présentation.",
+                "→ Veuillez insérer ce schéma manuellement.",
+                "",
+                `Fichier source : ${schema.chemin_fichier}`,
+              ].join("\n")
+            );
+          } else {
+            const imgBytes = await readFile(schema.chemin_fichier);
+            const ext = schema.type === "JPEG" ? "jpg" : "png";
+            if (ext === "jpg") hasMedia.jpg = true;
+            else hasMedia.png = true;
+            const mediaFile = `slide${slideIdx}_img${mediaIdx}.${ext}`;
+            mediaIdx++;
+            result = makeImageSlide(schema.nom, schema.type, imgBytes, mediaFile);
+          }
           break;
         }
 
@@ -438,9 +466,10 @@ export async function generatePresentation(
     .map((s, i) => `<p:sldId id="${s.id}" r:id="rId${i + 10}"/>`)
     .join("");
 
+  // Flag /s (dotAll) : traverse les sauts de ligne dans sldIdLst multiligne
   const presXmlUpdated = presXmlOrig.replace(
-    /<p:sldIdLst>.*?<\/p:sldIdLst>/,
-    `<p:sldIdLst>${newSldIdLst}<\/p:sldIdLst>`
+    /<p:sldIdLst>[\s\S]*?<\/p:sldIdLst>/,
+    `<p:sldIdLst>${newSldIdLst}</p:sldIdLst>`
   );
   zip.file("ppt/presentation.xml", presXmlUpdated);
 
@@ -473,12 +502,14 @@ export async function generatePresentation(
   const ctOrig = await zip.file("[Content_Types].xml")!.async("text");
 
   // Supprimer les anciennes Override de slides
+  // Note : [^>]*\/> utilise le backtracking pour éviter que [^/]* stoppe
+  //        au premier '/' du ContentType (application/vnd.openxmlformats...)
   const ctClean = ctOrig.replace(
-    /<Override PartName="\/ppt\/slides\/slide\d+\.xml"[^/]*\/>/g,
+    /<Override PartName="\/ppt\/slides\/slide\d+\.xml"[^>]*\/>/g,
     ""
   );
 
-  // Ajouter les nouvelles + éventuellement SVG
+  // Nouvelles Override pour les slides générées
   const newSlideOverrides = generated
     .map((s) => {
       const part = "/" + s.zipPath; // "/ppt/slides/slideN.xml"
@@ -486,15 +517,18 @@ export async function generatePresentation(
     })
     .join("");
 
-  // SVG : ajouter le Default si des images SVG ont été insérées
-  const svgDefault =
-    ctClean.includes('Extension="svg"') || !hasSvgMedia
-      ? ""
-      : '<Default Extension="svg" ContentType="image/svg+xml"/>';
+  // Ajouter les Default manquants pour les extensions médias utilisées
+  const mediaDefaults: string[] = [];
+  if (hasMedia.png && !ctClean.includes('Extension="png"')) {
+    mediaDefaults.push('<Default Extension="png" ContentType="image/png"/>');
+  }
+  if (hasMedia.jpg && !ctClean.includes('Extension="jpg"')) {
+    mediaDefaults.push('<Default Extension="jpg" ContentType="image/jpeg"/>');
+  }
 
   const ctUpdated = ctClean.replace(
     "</Types>",
-    svgDefault + newSlideOverrides + "</Types>"
+    mediaDefaults.join("") + newSlideOverrides + "</Types>"
   );
   zip.file("[Content_Types].xml", ctUpdated);
 

@@ -103,6 +103,14 @@ export interface CompteRendu {
   updated_at: string;
 }
 
+export interface CrPieceJointe {
+  id: number;
+  compte_rendu_id: number;
+  nom: string;
+  chemin: string;
+  created_at: string;
+}
+
 // Vue transversale (page Comptes-rendus sidebar)
 export interface CompteRenduAvecDossier extends CompteRendu {
   dossier_titre: string;

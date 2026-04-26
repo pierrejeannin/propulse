@@ -8,6 +8,7 @@ import type {
   Client,
   CompteRendu,
   CompteRenduAvecDossier,
+  CrPieceJointe,
   Devis,
   DevisAvecTotal,
   DevisLigne,
@@ -279,6 +280,36 @@ export async function deleteCompteRendu(id: number): Promise<void> {
   await db.execute("DELETE FROM compte_rendus WHERE id = ?", [id]);
 }
 
+// ─── CR PIÈCES JOINTES ────────────────────────────────────────────────────────
+
+export async function getCrPiecesJointes(
+  crId: number
+): Promise<CrPieceJointe[]> {
+  const db = await getDb();
+  return db.select<CrPieceJointe[]>(
+    "SELECT * FROM cr_pieces_jointes WHERE compte_rendu_id = ? ORDER BY created_at ASC",
+    [crId]
+  );
+}
+
+export async function addCrPieceJointe(
+  crId: number,
+  nom: string,
+  chemin: string
+): Promise<number> {
+  const db = await getDb();
+  const result = await db.execute(
+    "INSERT INTO cr_pieces_jointes (compte_rendu_id, nom, chemin) VALUES (?, ?, ?)",
+    [crId, nom, chemin]
+  );
+  return result.lastInsertId as number;
+}
+
+export async function deleteCrPieceJointe(id: number): Promise<void> {
+  const db = await getDb();
+  await db.execute("DELETE FROM cr_pieces_jointes WHERE id = ?", [id]);
+}
+
 // ─── CATALOGUE FAMILLES ───────────────────────────────────────────────────────
 
 export async function getCatalogueFamilles(): Promise<CatalogueFamille[]> {
@@ -445,6 +476,11 @@ export async function setDefaultCpArticle(id: number | null): Promise<void> {
 export async function deleteCatalogueArticle(id: number): Promise<void> {
   const db = await getDb();
   await db.execute("DELETE FROM catalogue_articles WHERE id = ?", [id]);
+}
+
+export async function deleteAllCatalogueArticles(): Promise<void> {
+  const db = await getDb();
+  await db.execute("DELETE FROM catalogue_articles");
 }
 
 // ─── DEVIS CP CONFIG ─────────────────────────────────────────────────────────

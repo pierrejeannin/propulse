@@ -45,6 +45,12 @@ pub fn run() {
             sql: include_str!("../migrations/007_powerpoint.sql"),
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 8,
+            description: "cr_pieces_jointes",
+            sql: include_str!("../migrations/008_cr_pj.sql"),
+            kind: MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()
