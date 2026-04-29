@@ -1,3 +1,4 @@
+import { remove } from "@tauri-apps/plugin-fs";
 import { getDb } from "./db";
 import type {
   ArticleType,
@@ -60,13 +61,16 @@ export async function updateClient(
     contact_email: string | null;
     contact_telephone: string | null;
     secteur: string | null;
+    adresse: string | null;
+    notes: string | null;
   }
 ): Promise<void> {
   const db = await getDb();
   await db.execute(
     `UPDATE clients
      SET nom = ?, contact_nom = ?, contact_email = ?,
-         contact_telephone = ?, secteur = ?, updated_at = datetime('now')
+         contact_telephone = ?, secteur = ?, adresse = ?, notes = ?,
+         updated_at = datetime('now')
      WHERE id = ?`,
     [
       data.nom,
@@ -74,9 +78,17 @@ export async function updateClient(
       data.contact_email,
       data.contact_telephone,
       data.secteur,
+      data.adresse,
+      data.notes,
       id,
     ]
   );
+}
+
+export async function deleteClient(id: number): Promise<void> {
+  const db = await getDb();
+  await db.execute("UPDATE dossiers SET client_id = NULL WHERE client_id = ?", [id]);
+  await db.execute("DELETE FROM clients WHERE id = ?", [id]);
 }
 
 // ─── DOSSIERS ────────────────────────────────────────────────────────────────
@@ -171,7 +183,45 @@ export async function updateDossierStatut(
 
 export async function deleteDossier(id: number): Promise<void> {
   const db = await getDb();
+
+  // 1. Collecter tous les chemins de fichiers physiques avant suppression
+  const [schemas, crPj, devisPj, pj] = await Promise.all([
+    db.select<{ chemin_fichier: string }[]>(
+      "SELECT chemin_fichier FROM schemas_architecture WHERE dossier_id = ?",
+      [id]
+    ),
+    db.select<{ chemin: string }[]>(
+      `SELECT pj.chemin
+       FROM cr_pieces_jointes pj
+       JOIN compte_rendus cr ON pj.compte_rendu_id = cr.id
+       WHERE cr.dossier_id = ?`,
+      [id]
+    ),
+    db.select<{ chemin_fichier: string }[]>(
+      `SELECT pj.chemin_fichier
+       FROM devis_pieces_jointes pj
+       JOIN devis d ON pj.devis_id = d.id
+       WHERE d.dossier_id = ?`,
+      [id]
+    ),
+    db.select<{ chemin_fichier: string }[]>(
+      "SELECT chemin_fichier FROM pieces_jointes WHERE dossier_id = ?",
+      [id]
+    ),
+  ]);
+
+  const filePaths = [
+    ...schemas.map((r) => r.chemin_fichier),
+    ...crPj.map((r) => r.chemin),
+    ...devisPj.map((r) => r.chemin_fichier),
+    ...pj.map((r) => r.chemin_fichier),
+  ];
+
+  // 2. Supprimer l'enregistrement (PRAGMA foreign_keys = ON → CASCADE sur tous les enfants)
   await db.execute("DELETE FROM dossiers WHERE id = ?", [id]);
+
+  // 3. Supprimer les fichiers physiques (erreurs ignorées silencieusement)
+  await Promise.allSettled(filePaths.map((p) => remove(p)));
 }
 
 // ─── COMPTES-RENDUS ───────────────────────────────────────────────────────────

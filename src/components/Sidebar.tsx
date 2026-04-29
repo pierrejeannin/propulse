@@ -10,6 +10,7 @@ import {
   Network,
   Presentation,
   Library,
+  Users,
   ChevronRight,
   Sun,
   Moon,
@@ -31,6 +32,7 @@ const mainNav: NavItem[] = [
 ];
 
 const globalNav: NavItem[] = [
+  { label: "Clients", path: "/clients", icon: Users },
   { label: "Catalogue articles", path: "/catalogue", icon: Package },
   { label: "Bibliothèque slides", path: "/bibliotheque", icon: Library },
 ];
@@ -103,7 +105,7 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-sidebar-border px-4 py-3">
-        <p className="text-[10px] text-sidebar-foreground/30">v0.1.0</p>
+        <p className="text-[10px] text-sidebar-foreground/30">v0.3.0</p>
 
         <button
           type="button"

@@ -72,9 +72,10 @@ function stripHtml(html: string | null | undefined): string {
 
 // ─── Helpers XML ──────────────────────────────────────────────────────────────
 
-/** Échappe les caractères spéciaux XML. */
+/** Échappe les caractères spéciaux XML et supprime les caractères interdits par la spec XML 1.0. */
 function xe(s: string): string {
   return s
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F￾￿]/g, "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -458,37 +459,28 @@ export async function generatePresentation(
     slideIdx++;
   }
 
-  // ── 4. Mise à jour de presentation.xml (<p:sldIdLst>) ──────────────────
-  const presXmlOrig = await zip.file("ppt/presentation.xml")!.async("text");
-
-  // rIds pour les slides : on commence à rId10 pour ne pas collisionner
-  const newSldIdLst = generated
-    .map((s, i) => `<p:sldId id="${s.id}" r:id="rId${i + 10}"/>`)
-    .join("");
-
-  // Flag /s (dotAll) : traverse les sauts de ligne dans sldIdLst multiligne
-  const presXmlUpdated = presXmlOrig.replace(
-    /<p:sldIdLst>[\s\S]*?<\/p:sldIdLst>/,
-    `<p:sldIdLst>${newSldIdLst}</p:sldIdLst>`
-  );
-  zip.file("ppt/presentation.xml", presXmlUpdated);
-
-  // ── 5. Mise à jour de presentation.xml.rels ────────────────────────────
+  // ── 4. Mise à jour de presentation.xml.rels ───────────────────────────
+  // (fait avant presentation.xml pour calculer les rIds disponibles)
   const presRelsOrig = await zip
     .file("ppt/_rels/presentation.xml.rels")!
     .async("text");
 
-  // Supprimer les anciennes relations de type "slide"
+  // Supprimer les anciennes relations de type "slide" (match sur le Type, plus fiable)
   const presRelsClean = presRelsOrig.replace(
-    /<Relationship[^>]*Target="slides\/slide\d+\.xml"[^>]*\/>/g,
+    /<Relationship\s[^>]*Type="[^"]*\/slide"[^>]*\/>/g,
     ""
   );
 
-  // Ajouter les nouvelles
+  // Calculer le prochain rId libre pour éviter toute collision
+  const usedRIds = [...presRelsClean.matchAll(/\bId="rId(\d+)"/g)].map((m) =>
+    parseInt(m[1], 10)
+  );
+  const startRId = usedRIds.length > 0 ? Math.max(...usedRIds) + 1 : 10;
+
   const newSlideRels = generated
     .map((s, i) => {
       const target = s.zipPath.replace("ppt/", "");
-      return `<Relationship Id="rId${i + 10}" Type="${REL_SLIDE}" Target="${target}"/>`;
+      return `<Relationship Id="rId${startRId + i}" Type="${REL_SLIDE}" Target="${target}"/>`;
     })
     .join("");
 
@@ -497,6 +489,27 @@ export async function generatePresentation(
     newSlideRels + "</Relationships>"
   );
   zip.file("ppt/_rels/presentation.xml.rels", presRelsUpdated);
+
+  // ── 5. Mise à jour de presentation.xml (<p:sldIdLst>) ──────────────────
+  const presXmlOrig = await zip.file("ppt/presentation.xml")!.async("text");
+
+  const newSldIdLst = generated
+    .map((s, i) => `<p:sldId id="${s.id}" r:id="rId${startRId + i}"/>`)
+    .join("");
+
+  // Flag /s (dotAll) : traverse les sauts de ligne dans sldIdLst multiligne
+  let presXmlUpdated = presXmlOrig.replace(
+    /<p:sldIdLst>[\s\S]*?<\/p:sldIdLst>/,
+    `<p:sldIdLst>${newSldIdLst}</p:sldIdLst>`
+  );
+  // Si le template a un sldIdLst auto-fermant <p:sldIdLst/>
+  if (presXmlUpdated === presXmlOrig) {
+    presXmlUpdated = presXmlOrig.replace(
+      /<p:sldIdLst\/>/,
+      `<p:sldIdLst>${newSldIdLst}</p:sldIdLst>`
+    );
+  }
+  zip.file("ppt/presentation.xml", presXmlUpdated);
 
   // ── 6. Mise à jour de [Content_Types].xml ─────────────────────────────
   const ctOrig = await zip.file("[Content_Types].xml")!.async("text");

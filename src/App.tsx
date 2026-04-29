@@ -5,6 +5,7 @@ import Dossiers from "@/pages/Dossiers";
 import DossierDetail from "@/pages/DossierDetail";
 import CompteRendus from "@/pages/CompteRendus";
 import Chiffrage from "@/pages/Chiffrage";
+import Clients from "@/pages/Clients";
 import Catalogue from "@/pages/Catalogue";
 import Schemas from "@/pages/Schemas";
 import PowerPoint from "@/pages/PowerPoint";
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="dossiers/:id" element={<DossierDetail />} />
         <Route path="comptes-rendus" element={<CompteRendus />} />
         <Route path="chiffrage" element={<Chiffrage />} />
+        <Route path="clients" element={<Clients />} />
         <Route path="catalogue" element={<Catalogue />} />
         <Route path="schemas" element={<Schemas />} />
         <Route path="powerpoint" element={<PowerPoint />} />
