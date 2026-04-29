@@ -423,7 +423,7 @@ function buildPrestation(
         alignment: { horizontal: "left", vertical: "center" },
       };
       const sCpR: CellStyle = { ...sCp, alignment: { horizontal: "right", vertical: "center" } };
-      writeCell(ws, row, 0, mkCell(`Pilotage projet · ${cpPourcentage} %`, sCp));
+      writeCell(ws, row, 0, mkCell("Pilotage projet", sCp));
       writeCell(ws, row, 1, mkCell("—", sCp));
       writeCell(ws, row, 2, mkCell(cpNom, sCp));
       writeCell(ws, row, 3, mkCell(fmtJours(cpJours), sCpR));
