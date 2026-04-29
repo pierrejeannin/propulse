@@ -33,21 +33,25 @@ export async function getClients(): Promise<Client[]> {
 
 export async function createClient(data: {
   nom: string;
-  contact_nom?: string;
-  contact_email?: string;
-  contact_telephone?: string;
-  secteur?: string;
+  contact_nom?: string | null;
+  contact_email?: string | null;
+  contact_telephone?: string | null;
+  secteur?: string | null;
+  adresse?: string | null;
+  notes?: string | null;
 }): Promise<number> {
   const db = await getDb();
   const result = await db.execute(
-    `INSERT INTO clients (nom, contact_nom, contact_email, contact_telephone, secteur)
-     VALUES (?, ?, ?, ?, ?)`,
+    `INSERT INTO clients (nom, contact_nom, contact_email, contact_telephone, secteur, adresse, notes)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [
       data.nom,
       data.contact_nom ?? null,
       data.contact_email ?? null,
       data.contact_telephone ?? null,
       data.secteur ?? null,
+      data.adresse ?? null,
+      data.notes ?? null,
     ]
   );
   return result.lastInsertId as number;

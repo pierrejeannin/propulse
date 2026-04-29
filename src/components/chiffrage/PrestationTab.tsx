@@ -105,6 +105,8 @@ function InlineProfilCell({ value, onChange, onBlur }: InlineProfilCellProps) {
     onChange(a.nom, a);
     setOpen(false);
     clearTimeout(closeTimer.current);
+    // Déclencher la sauvegarde — onChange a déjà mis à jour rowsRef en synchrone
+    onBlur();
   }
 
   return (
@@ -368,6 +370,7 @@ interface PrestationTabProps {
 
 export function PrestationTab({ devisId, onTotalChange }: PrestationTabProps) {
   const [rows, setRows] = useState<RowState[]>([]);
+  const rowsRef = useRef<RowState[]>([]); // toujours à jour, évite les closures stales dans saveRow
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
@@ -381,7 +384,9 @@ export function PrestationTab({ devisId, onTotalChange }: PrestationTabProps) {
       getDefaultCpArticle(),
       getDevisCpPourcentage(devisId),
     ]);
-    setRows(lignes.map(ligneToRow));
+    const mapped = lignes.map(ligneToRow);
+    setRows(mapped);
+    rowsRef.current = mapped;
     setCpArticle(cp);
     setCpPourcentage(String(pct));
   }, [devisId]);
@@ -423,11 +428,15 @@ export function PrestationTab({ devisId, onTotalChange }: PrestationTabProps) {
   // ── Mutation helpers ──────────────────────────────────────────────────────
 
   function patchRow(id: number, patch: Partial<RowState>) {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+    setRows((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      rowsRef.current = next; // sync immédiat, pas d'attente de re-render
+      return next;
+    });
   }
 
   async function saveRow(id: number) {
-    const row = rows.find((r) => r.id === id);
+    const row = rowsRef.current.find((r) => r.id === id); // lecture depuis la ref, toujours fraîche
     if (!row) return;
     try {
       await updatePrestationLigne(id, {
@@ -456,10 +465,11 @@ export function PrestationTab({ devisId, onTotalChange }: PrestationTabProps) {
         jours: 1,
         ordre: rows.length,
       });
-      setRows((prev) => [
-        ...prev,
-        { id, tache: "", description: "", profil_label: "", article_id: null, tjm: "", jours: "1", ordre: prev.length },
-      ]);
+      setRows((prev) => {
+        const next = [...prev, { id, tache: "", description: "", profil_label: "", article_id: null, tjm: "", jours: "1", ordre: prev.length }];
+        rowsRef.current = next;
+        return next;
+      });
     } catch (err) {
       console.error(err);
     } finally {
@@ -472,7 +482,11 @@ export function PrestationTab({ devisId, onTotalChange }: PrestationTabProps) {
     const label = row?.tache || row?.profil_label || "cette ligne";
     if (!window.confirm(`Supprimer « ${label} » ?`)) return;
     await deletePrestationLigne(id);
-    setRows((prev) => prev.filter((r) => r.id !== id));
+    setRows((prev) => {
+      const next = prev.filter((r) => r.id !== id);
+      rowsRef.current = next;
+      return next;
+    });
   }
 
   // ── Synthèse par profil (lignes + CP) ────────────────────────────────────

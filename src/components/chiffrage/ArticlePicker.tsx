@@ -12,12 +12,14 @@ interface ArticlePickerProps {
   value: CatalogueArticle | null;
   onChange: (article: CatalogueArticle | null) => void;
   placeholder?: string;
+  familleId?: number | null;
 }
 
 export function ArticlePicker({
   value,
   onChange,
   placeholder = "Rechercher un article du catalogue…",
+  familleId,
 }: ArticlePickerProps) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -26,16 +28,19 @@ export function ArticlePicker({
   const containerRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
 
-  // Chargement des articles filtrés
+  // Chargement des articles filtrés (+ filtre famille si défini)
   useEffect(() => {
     if (!open) return;
     setLoading(true);
     const q = query.trim();
-    getCatalogueArticles({ search: q || undefined })
+    getCatalogueArticles({
+      search: q || undefined,
+      famille_id: familleId ?? undefined,
+    })
       .then(setArticles)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [query, open]);
+  }, [query, open, familleId]);
 
   function select(a: CatalogueArticle) {
     onChange(a);

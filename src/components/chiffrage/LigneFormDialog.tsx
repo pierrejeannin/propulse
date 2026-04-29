@@ -18,8 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArticlePicker } from "./ArticlePicker";
-import { createDevisLigne, updateDevisLigne } from "@/lib/queries";
-import type { CatalogueArticle, DevisLigne, DevisSection, margeLigne as _m, totalLigne as _t } from "@/lib/types";
+import { createDevisLigne, updateDevisLigne, getCatalogueFamilles } from "@/lib/queries";
+import type { CatalogueArticle, CatalogueFamille, DevisLigne, DevisSection, margeLigne as _m, totalLigne as _t } from "@/lib/types";
 import { totalLigne, margeLigne } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -93,13 +93,17 @@ export function LigneFormDialog({
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [familles, setFamilles] = useState<CatalogueFamille[]>([]);
+  const [familleId, setFamilleId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
     setErrors({});
+    setFamilleId(null);
     setForm(
       initialData ? formFromLigne(initialData) : defaultForm(defaultSectionId)
     );
+    getCatalogueFamilles().then(setFamilles).catch(console.error);
   }, [open, initialData, defaultSectionId]);
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
@@ -206,14 +210,40 @@ export function LigneFormDialog({
             ))}
           </div>
 
-          {/* Article picker ou désignation libre */}
+          {/* Filtre famille + Article picker */}
           {form.mode === "catalogue" ? (
-            <div className="space-y-1.5">
-              <Label>Article</Label>
-              <ArticlePicker
-                value={form.article}
-                onChange={handleArticleChange}
-              />
+            <div className="space-y-2">
+              {familles.length > 0 && (
+                <div className="space-y-1.5">
+                  <Label>Famille</Label>
+                  <Select
+                    value={familleId ? String(familleId) : "all"}
+                    onValueChange={(v) => {
+                      setFamilleId(v === "all" ? null : Number(v));
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Toutes les familles" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">— Toutes les familles —</SelectItem>
+                      {familles.map((f) => (
+                        <SelectItem key={f.id} value={String(f.id)}>
+                          {f.nom}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label>Article</Label>
+                <ArticlePicker
+                  value={form.article}
+                  onChange={handleArticleChange}
+                  familleId={familleId}
+                />
+              </div>
             </div>
           ) : null}
 
